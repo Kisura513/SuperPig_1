@@ -6,9 +6,9 @@ from pygame import *
 from monsters import Monster
 import os
 
-DIS_WIDHT = 1100
+DIS_WIDTH = 1100
 DIS_HEIGHT = 850
-DISPLAY = (DIS_WIDHT, DIS_HEIGHT)
+DISPLAY = (DIS_WIDTH, DIS_HEIGHT)
 BACKGROUNT_COLOR = "#004400"
 
 PLATFORM_WIDTH = 32
@@ -24,7 +24,7 @@ def loadLevel():
     level.clear()
     commands = []
 
-    path = os.path.join('pig', 'level_1.txt')
+    path = os.path.join('pig', 'levels.txt')
     with open(path, "r") as levelFile:
         reading_map = False
 
@@ -76,8 +76,8 @@ def main():
     loadLevel()
     pygame.init()
     screen = pygame.display.set_mode(DISPLAY)
-    pygame.display.set_caption("Hollow Night")
-    bg = Surface((DIS_WIDHT, DIS_HEIGHT))
+    pygame.display.set_caption("SuperPig")
+    bg = Surface((DIS_WIDTH, DIS_HEIGHT))
 
     bg.fill(color=BACKGROUNT_COLOR)
 
@@ -95,6 +95,7 @@ def main():
     total_level_height = len(level) * PLATFORM_HEIGHT
 
     camera = Camera(Camera.camera_configure, total_level_widht, total_level_height)
+    camera.update(hero)
 
     x = y = 0
     for row in level:
@@ -121,6 +122,7 @@ def main():
 
     while 1:
         timer.tick(60)
+        camera.update(hero)
         for e in pygame.event.get():
             if e.type == KEYDOWN and e.key == K_LEFT:
                 left = True
@@ -140,20 +142,28 @@ def main():
                 running = False
             if e.type == QUIT:
                 raise SystemExit("QUIT")
+
         screen.blit(bg, (0, 0))
         hero.update(left, right, up, running, platform)
+        if hero.winner:
+            font = pygame.font.Font(None, 100)
+            text = font.render("ТЫ ПОБЕДИЛ!", True, (255, 215, 0))
+            rect = text.get_rect(center=(DIS_WIDTH // 2, DIS_HEIGHT // 2))
+            screen.blit(text, rect)
         for e in entities:
             screen.blit(e.image, camera.apply(e))
-        animatedEntities.update()
-        monsters.update(platform)
+        if not hero.winner:
+            camera.update(hero)
+            animatedEntities.update()
+            monsters.update(platform)
         pygame.display.update()
+
 
 level = []
 entities = pygame.sprite.Group()
 animatedEntities = pygame.sprite.Group()
 monsters = pygame.sprite.Group()
 platform = []
-
 
 if __name__ == "__main__":
     main()

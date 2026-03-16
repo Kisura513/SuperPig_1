@@ -25,6 +25,8 @@ ANIMATION_SUPER_SPEED_DELAY = 1.5
 
 
 class Player(sprite.Sprite):
+    winner = False
+
     def __init__(self, x, y):
         sprite.Sprite.__init__(self)
         self.xvel = 0
@@ -60,9 +62,12 @@ class Player(sprite.Sprite):
         self.boltAnimJumpLeft.play()
         self.boltAnimJumpRight = pyganim.PygAnimation(ANIMATION_JUMP_RIGHT)
         self.boltAnimJumpRight.play()
-        self.winner = False
 
     def update(self, left, right, up, running, platform):
+        if self.winner:
+            self.xvel = 0
+            self.yvel = 0
+            return
         if up:
             if self.onGround:
                 self.yvel = -JUMP_POWER
@@ -133,12 +138,17 @@ class Player(sprite.Sprite):
                 elif isinstance(p, blocks.BlockTeleport):
                     self.teleporting(p.goX, p.goY)
                 elif isinstance(p, blocks.FlagWin):
-                    self.winner = True
+                    self.win()
 
     def die(self):
-        time.wait(500)
+        time.wait(100)
         self.teleporting(self.startX, self.startY)
 
     def teleporting(self, goX, goY):
         self.rect.x = goX
         self.rect.y = goY
+
+    def win(self):
+        self.winner = True
+        self.xvel = 0
+        self.yvel = 0

@@ -1,7 +1,7 @@
 from pygame.rect import Rect
 
-DIS_WIDTH = 800
-DIS_HEIGHT = 600
+SCREEN_WIDTH = 1100
+SCREEN_HEIGHT = 850
 
 
 class Camera(object):
@@ -18,10 +18,14 @@ class Camera(object):
     def camera_configure(camera, target_rect):
         l, t, _, _ = target_rect
         _, _, w, h = camera
-        l, t = -l + DIS_WIDTH / 2, -t + DIS_HEIGHT / 2
+
+        l = -l + SCREEN_WIDTH // 2
+        t = -t + SCREEN_HEIGHT // 2
+
         l = min(0, l)
-        t = max(-(camera.width - DIS_WIDTH), l)
         t = min(0, t)
-        t = max(-(camera.height - DIS_HEIGHT), t)
+
+        l = max(-(camera.width - SCREEN_WIDTH), l)
+        t = max(-(camera.height - SCREEN_HEIGHT), t)
 
         return Rect(l, t, w, h)
